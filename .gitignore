@@ -3,6 +3,12 @@ Library/
 
 Logs/
 
-Zafiros PROJECT.sln
-
 *.csproj
+
+Temp/
+
+Zafiros-Project.sln
+
+obj/
+
+.vs/
