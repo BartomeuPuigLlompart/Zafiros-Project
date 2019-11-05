@@ -17,11 +17,52 @@ public class Controller : MonoBehaviour
 
     int shootFrames;
 
+    [SerializeField]
+    GameObject leftArm;
+
+    [SerializeField]
+    GameObject rightArm;
+
+    Vector3[] leftHandPos;
+    Vector3[] leftHandRot;
+    Vector3[] rightHandPos;
+    Vector3[] rightHandRot;
+
+    Vector3 startLeftHandPos;
+    Vector3 startLeftHandRot;
+    Vector3 startRightHandPos;
+    Vector3 startRightHandRot;
+
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         shootFrames = 0;
+
+        startLeftHandPos = leftArm.transform.localPosition;
+        startLeftHandRot = leftArm.transform.localEulerAngles;
+        startRightHandPos = rightArm.transform.localPosition;
+        startRightHandRot = rightArm.transform.localEulerAngles;
+
+        leftHandPos = new Vector3[2];
+        leftHandRot = new Vector3[2];
+        rightHandPos = new Vector3[2];
+        rightHandRot = new Vector3[2];
+
+
+        leftHandPos[0] = transform.GetChild(0).GetChild(2).transform.localPosition;
+        leftHandRot[0] = transform.GetChild(0).GetChild(2).transform.localEulerAngles;
+        rightHandPos[0] = transform.GetChild(0).GetChild(3).transform.localPosition;
+        rightHandRot[0] = transform.GetChild(0).GetChild(3).transform.localEulerAngles;
+        leftHandPos[1] = transform.GetChild(0).GetChild(4).transform.localPosition;
+        leftHandRot[1] = transform.GetChild(0).GetChild(4).transform.localEulerAngles;
+        rightHandPos[1] = transform.GetChild(0).GetChild(5).transform.localPosition;
+        rightHandRot[1] = transform.GetChild(0).GetChild(5).transform.localEulerAngles;     
+
+        for (int i = 5; i > 1; i--)
+        {
+            Destroy(transform.GetChild(0).GetChild(i).gameObject);
+        }
     }
 
     // Update is called once per frame
@@ -29,6 +70,7 @@ public class Controller : MonoBehaviour
     {
         updateSpeed();
         updateOrientation();
+        checkShootMode();
         checkShoot();
     }
 
@@ -48,7 +90,35 @@ public class Controller : MonoBehaviour
         Physics.Raycast(Camera.main.gameObject.transform.position, mousePos - Camera.main.transform.position, out hit, zValue, 9);
 
         mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Vector3.Distance(Camera.main.transform.position, hit.point)));
-        transform.LookAt(new Vector3(mousePos.x, transform.position.y, mousePos.z));
+        if(!Input.GetKey(KeyCode.Space))transform.LookAt(new Vector3(mousePos.x, transform.position.y, mousePos.z));
+    }
+
+    void checkShootMode()
+    {
+        if (Input.GetKey(KeyCode.Space))
+        {
+            rb.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
+            if (rb.velocity.magnitude > 1) transform.LookAt(transform.position + rb.velocity);
+
+            float lerpRef = ((Input.mousePosition.y - (Screen.height / 7)) / (Screen.height - (Screen.height / 3)));
+
+            Debug.Log(lerpRef);
+
+            leftArm.transform.localPosition = Vector3.Lerp(leftHandPos[1], leftHandPos[0], lerpRef);
+            leftArm.transform.localEulerAngles = Vector3.Lerp(leftHandRot[1], leftHandRot[0], lerpRef);
+            rightArm.transform.localPosition = Vector3.Lerp(rightHandPos[1], rightHandPos[0], lerpRef);
+            rightArm.transform.localEulerAngles = Vector3.Lerp(rightHandRot[1], rightHandRot[0], lerpRef);
+
+        }
+        else
+        {
+            rb.constraints = RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezePositionY;
+
+            leftArm.transform.localPosition = startLeftHandPos;
+            leftArm.transform.localEulerAngles = startLeftHandRot;
+            rightArm.transform.localPosition = startRightHandPos;
+            rightArm.transform.localEulerAngles = startRightHandRot;
+        }
     }
 
     void checkShoot()
@@ -61,13 +131,13 @@ public class Controller : MonoBehaviour
                 shot.transform.position = transform.GetChild(0).GetChild(0).GetChild(1).transform.position;
                 shot.transform.rotation = transform.GetChild(0).GetChild(0).GetChild(1).transform.rotation;
                 shot.GetComponent<Collider>().enabled = true;
-                shot.transform.LookAt(transform.position + transform.forward * 10);
+                shot.transform.LookAt(transform.position + transform.GetChild(0).GetChild(0).GetChild(0).transform.forward * 10);
                 shot.transform.GetChild(0).GetComponent<ParticleSystem>().Play();
                 shot.GetComponent<MeshRenderer>().enabled = true;
                 shot.AddComponent<Rigidbody>();
                 shot.GetComponent<Rigidbody>().useGravity = false;
                 shot.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
-                shot.GetComponent<Rigidbody>().AddForce(transform.forward * 1000.0f);
+                shot.GetComponent<Rigidbody>().AddForce(shot.transform.forward * 1000.0f);
                 shot.AddComponent<shot>();
             }
             else if (shootFrames == 15 || shootFrames == 45)
@@ -76,13 +146,13 @@ public class Controller : MonoBehaviour
                 shot.transform.position = transform.GetChild(0).GetChild(1).GetChild(1).transform.position;
                 shot.transform.rotation = transform.GetChild(0).GetChild(1).GetChild(1).transform.rotation;
                 shot.GetComponent<Collider>().enabled = true;
-                shot.transform.LookAt(transform.position + transform.forward * 10);
+                shot.transform.LookAt(transform.position + transform.GetChild(0).GetChild(1).GetChild(0).transform.forward * 10);
                 shot.transform.GetChild(0).GetComponent<ParticleSystem>().Play();
                 shot.GetComponent<MeshRenderer>().enabled = true;
                 shot.AddComponent<Rigidbody>();
                 shot.GetComponent<Rigidbody>().useGravity = false;
                 shot.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
-                shot.GetComponent<Rigidbody>().AddForce(transform.forward * 1000.0f);
+                shot.GetComponent<Rigidbody>().AddForce(shot.transform.forward * 1000.0f);
                 shot.AddComponent<shot>();
             }
             shootFrames++;
