@@ -9,6 +9,10 @@ public class shot : MonoBehaviour
     {
         Destroy(gameObject);
     }
-    
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Limit") Destroy(gameObject);
+    }
 
 }
