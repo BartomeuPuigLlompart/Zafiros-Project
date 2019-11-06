@@ -44,6 +44,8 @@ public class Controller : MonoBehaviour
     [SerializeField]
     GameObject canvas;
 
+    static public bool freeze;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -51,6 +53,7 @@ public class Controller : MonoBehaviour
         shootFrames = 0;
         overheat = 0;
         overheated = false;
+        freeze = false;
 
         startLeftHandPos = leftArm.transform.localPosition;
         startLeftHandRot = leftArm.transform.localEulerAngles;
@@ -81,10 +84,13 @@ public class Controller : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        updateSpeed();
-        updateOrientation();
-        checkShootMode();
-        checkShoot();
+        if (!freeze)
+        {            
+            updateSpeed();
+            updateOrientation();
+            checkShootMode();
+            checkShoot();
+        }
         updateUI();
     }
 
@@ -103,7 +109,9 @@ public class Controller : MonoBehaviour
 
         Physics.Raycast(Camera.main.gameObject.transform.position, mousePos - Camera.main.transform.position, out hit, zValue, 9);
 
-        mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Vector3.Distance(Camera.main.transform.position, hit.point)));
+        mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Vector3.Distance(Camera.main.transform.position, hit.point) - Mathf.Abs(Camera.main.transform.position.z - limitsManager.cameraPosRef.z - 24)));
+        mousePos = new Vector3(mousePos.x, transform.position.y, mousePos.z);
+        transform.GetChild(1).transform.position = mousePos;
         if(!Input.GetKey(KeyCode.Space))transform.LookAt(new Vector3(mousePos.x, transform.position.y, mousePos.z));
     }
 
