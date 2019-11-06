@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Controller : MonoBehaviour
 {
@@ -39,6 +40,9 @@ public class Controller : MonoBehaviour
     Vector3 startLeftHandRot;
     Vector3 startRightHandPos;
     Vector3 startRightHandRot;
+
+    [SerializeField]
+    GameObject canvas;
 
     // Start is called before the first frame update
     void Start()
@@ -81,6 +85,7 @@ public class Controller : MonoBehaviour
         updateOrientation();
         checkShootMode();
         checkShoot();
+        updateUI();
     }
 
     void updateSpeed()
@@ -181,7 +186,40 @@ public class Controller : MonoBehaviour
                 }                
             }
         }
-        Debug.Log(overheat);
-        Debug.Log(overheated);
+    }
+
+    void updateUI()
+    {
+        float range = (float)overheat / (float)overheatLimit;
+        canvas.transform.GetChild(0).GetComponent<Slider>().value = range;
+
+        Color sliderColor, backgroundColor;
+        ColorBlock colorBlockSlider = canvas.transform.GetChild(0).GetComponent<Slider>().colors;
+        sliderColor = colorBlockSlider.disabledColor;
+
+        backgroundColor = canvas.transform.GetChild(0).GetChild(0).GetComponent<Image>().color;
+
+        if (!overheated)
+        {            
+            sliderColor.r = 1;
+            sliderColor.g = 194.0f / 255.0f;
+            sliderColor.b = 0;
+            colorBlockSlider.disabledColor = sliderColor;
+            canvas.transform.GetChild(0).GetComponent<Slider>().colors = colorBlockSlider;
+
+            backgroundColor.g = 155.0f / 255.0f - (range * 155) / 255.0f;
+            canvas.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = backgroundColor;
+            canvas.transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Image>().color = backgroundColor;
+        }
+        else
+        {
+            backgroundColor.r = sliderColor.r = 1;
+            backgroundColor.g = backgroundColor.b = sliderColor.g = sliderColor.b = 0;
+            colorBlockSlider.disabledColor = sliderColor;
+            canvas.transform.GetChild(0).GetComponent<Slider>().colors = colorBlockSlider;
+            canvas.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = backgroundColor;
+            canvas.transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Image>().color = backgroundColor;
+
+        }
     }
 }
