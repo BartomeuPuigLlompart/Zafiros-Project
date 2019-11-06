@@ -12,6 +12,13 @@ public class Controller : MonoBehaviour
    [SerializeField]
     float speed;
 
+    int overheat;
+
+    bool overheated;
+
+    [SerializeField]
+    int overheatLimit;
+
     [SerializeField]
     float zValue;
 
@@ -38,6 +45,8 @@ public class Controller : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         shootFrames = 0;
+        overheat = 0;
+        overheated = false;
 
         startLeftHandPos = leftArm.transform.localPosition;
         startLeftHandRot = leftArm.transform.localEulerAngles;
@@ -102,8 +111,6 @@ public class Controller : MonoBehaviour
 
             float lerpRef = ((Input.mousePosition.y - (Screen.height / 7)) / (Screen.height - (Screen.height / 3)));
 
-            Debug.Log(lerpRef);
-
             leftArm.transform.localPosition = Vector3.Lerp(leftHandPos[1], leftHandPos[0], lerpRef);
             leftArm.transform.localEulerAngles = Vector3.Lerp(leftHandRot[1], leftHandRot[0], lerpRef);
             rightArm.transform.localPosition = Vector3.Lerp(rightHandPos[1], rightHandPos[0], lerpRef);
@@ -123,7 +130,7 @@ public class Controller : MonoBehaviour
 
     void checkShoot()
     {
-        if (Input.GetAxis("Fire") > 0)
+        if (!overheated && Input.GetAxis("Fire") > 0 && overheat < overheatLimit)
         {
             if (shootFrames == 0 || shootFrames == 30)
             {
@@ -156,9 +163,25 @@ public class Controller : MonoBehaviour
                 shot.AddComponent<shot>();
             }
             shootFrames++;
+            overheat += 2;
             if (shootFrames == 60) shootFrames = 0;
         }
 
-        else shootFrames = 0;
+        else
+        {
+            shootFrames = 0;
+            if (overheat == overheatLimit) overheated = true;
+            if (overheat > 0)
+            {
+                if (!overheated) overheat -= 2;
+                else
+                {
+                    overheat--;
+                    if (overheat == 0) overheated = false;
+                }                
+            }
+        }
+        Debug.Log(overheat);
+        Debug.Log(overheated);
     }
 }
