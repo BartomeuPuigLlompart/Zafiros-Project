@@ -38,13 +38,16 @@ public class limitsManager : MonoBehaviour
     {
         if (!lerping) return;
         lerpFrames++;
-        Debug.Log(Vector3.Lerp(lastCameraPos, transform.position + cameraPosRef, (float)lerpFrames / 100.0f));
         Camera.main.transform.position = Vector3.Lerp(lastCameraPos, transform.position + cameraPosRef, (float)lerpFrames / 100.0f);        
         if(lerpFrames == 100)
         {
             lerpFrames = 0;
             lerping = false;
             Controller.freeze = false;
+            GameObject.Find("Player").GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezePositionY;
+            Vector3 impulse = Camera.main.transform.position - GameObject.Find("Player").transform.position;
+            impulse = new Vector3(impulse.x, 0, impulse.z);
+            GameObject.Find("Player").transform.position += impulse.normalized * 3;
         }
     }
 }

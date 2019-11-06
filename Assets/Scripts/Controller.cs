@@ -26,6 +26,9 @@ public class Controller : MonoBehaviour
     int shootFrames;
 
     [SerializeField]
+    float smoothRotation;
+
+    [SerializeField]
     GameObject leftArm;
 
     [SerializeField]
@@ -85,12 +88,13 @@ public class Controller : MonoBehaviour
     void Update()
     {
         if (!freeze)
-        {            
+        {
             updateSpeed();
             updateOrientation();
             checkShootMode();
             checkShoot();
         }
+        else rb.constraints = RigidbodyConstraints.FreezeAll;
         updateUI();
     }
 
@@ -112,7 +116,15 @@ public class Controller : MonoBehaviour
         mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Vector3.Distance(Camera.main.transform.position, hit.point) - Mathf.Abs(Camera.main.transform.position.z - limitsManager.cameraPosRef.z - 24)));
         mousePos = new Vector3(mousePos.x, transform.position.y, mousePos.z);
         transform.GetChild(1).transform.position = mousePos;
-        if(!Input.GetKey(KeyCode.Space))transform.LookAt(new Vector3(mousePos.x, transform.position.y, mousePos.z));
+
+        Quaternion lastRotation = transform.rotation, nextRotation = transform.rotation;
+        if (!Input.GetKey(KeyCode.Space)){
+            transform.LookAt(new Vector3(mousePos.x, transform.position.y, mousePos.z));
+            nextRotation = transform.rotation;
+        }
+
+        transform.rotation = lastRotation;
+        transform.rotation = Quaternion.Slerp(lastRotation, nextRotation, smoothRotation * Time.deltaTime);
     }
 
     void checkShootMode()

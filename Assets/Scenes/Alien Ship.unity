@@ -20080,6 +20080,7 @@ MonoBehaviour:
   speed: 10
   overheatLimit: 300
   zValue: 25
+  smoothRotation: 5
   leftArm: {fileID: 967811824}
   rightArm: {fileID: 1257354565}
   canvas: {fileID: 1182065537}
