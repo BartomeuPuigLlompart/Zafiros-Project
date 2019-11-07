@@ -22,6 +22,7 @@ public class limitsManager : MonoBehaviour
     void Update()
     {
         lerpCamera();
+        checkEnemiesLeft();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -48,6 +49,17 @@ public class limitsManager : MonoBehaviour
             Vector3 impulse = Camera.main.transform.position - GameObject.Find("Player").transform.position;
             impulse = new Vector3(impulse.x, 0, impulse.z);
             GameObject.Find("Player").transform.position += impulse.normalized * 3;
+            if (transform.parent.GetChild(1).childCount != 0) roomsManager.cleanRoom = false;
+            Debug.Log(transform.parent.GetChild(1).childCount);
+            Debug.Log(roomsManager.cleanRoom);
         }
+    }
+
+    void checkEnemiesLeft()
+    {
+        Debug.Log(roomsManager.cleanRoom);
+        if (roomsManager.cleanRoom) return;
+
+        else if(transform.parent.GetChild(1).childCount == 0 && Camera.main.transform.position - cameraPosRef == transform.position) roomsManager.cleanRoom = true;
     }
 }
