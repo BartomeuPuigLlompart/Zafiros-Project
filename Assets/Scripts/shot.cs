@@ -15,14 +15,9 @@ public class shot : MonoBehaviour
         if (collision.gameObject.tag == "Limit") Destroy(gameObject);
         else if (collision.gameObject.transform.parent != null && collision.gameObject.transform.parent.name == "Enemies")
         {
-            Destroy(collision.gameObject);
+            collision.gameObject.GetComponent<enemyController>().hit();
             Destroy(gameObject);
         }
-    }
-
-    private void OnTriggerExit(Collider collision)
-    {
-        if (collision.gameObject.name == "Limits") Destroy(gameObject);      
     }
 
 }
