@@ -22,6 +22,8 @@ public class Controller : MonoBehaviour
 
     [SerializeField]
     float zValue;
+    [SerializeField]
+    float smoothZValue;
 
     int shootFrames;
 
@@ -47,6 +49,8 @@ public class Controller : MonoBehaviour
     [SerializeField]
     GameObject canvas;
 
+    Vector3 startPos;
+
     static public bool freeze;
 
     // Start is called before the first frame update
@@ -57,6 +61,7 @@ public class Controller : MonoBehaviour
         overheat = 0;
         overheated = false;
         freeze = false;
+        startPos = transform.position;
 
         startLeftHandPos = leftArm.transform.localPosition;
         startLeftHandRot = leftArm.transform.localEulerAngles;
@@ -82,6 +87,8 @@ public class Controller : MonoBehaviour
         {
             Destroy(transform.GetChild(0).GetChild(i).gameObject);
         }
+
+        Cursor.visible = false;
     }
 
     // Update is called once per frame
@@ -113,15 +120,21 @@ public class Controller : MonoBehaviour
 
         Physics.Raycast(Camera.main.gameObject.transform.position, mousePos - Camera.main.transform.position, out hit, zValue, 9);
 
-        mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Vector3.Distance(Camera.main.transform.position, hit.point) - Mathf.Abs(Camera.main.transform.position.z - limitsManager.cameraPosRef.z - 24)));
+        mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Vector3.Distance(startPos, hit.point)));
         mousePos = new Vector3(mousePos.x, transform.position.y, mousePos.z);
         transform.GetChild(1).transform.position = mousePos;
+        Vector3 groundCam = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z);
+        transform.GetChild(1).transform.position = transform.GetChild(1).transform.position + (groundCam - transform.GetChild(1).transform.position).normalized *
+            Vector3.Distance(groundCam, transform.GetChild(1).transform.position) * smoothZValue;
+        mousePos = transform.GetChild(1).transform.position;
 
         Quaternion lastRotation = transform.rotation, nextRotation = transform.rotation;
         if (!Input.GetKey(KeyCode.Space)){
             transform.LookAt(new Vector3(mousePos.x, transform.position.y, mousePos.z));
             nextRotation = transform.rotation;
+            transform.GetChild(1).GetComponent<MeshRenderer>().enabled = true;
         }
+        else transform.GetChild(1).GetComponent<MeshRenderer>().enabled = false;
 
         transform.rotation = lastRotation;
         transform.rotation = Quaternion.Slerp(lastRotation, nextRotation, smoothRotation * Time.deltaTime);
