@@ -31,7 +31,7 @@ public class enemiesManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {        
-        if(emptyEnemies && cleanRef + respawnTime < Time.realtimeSinceStartup && !transform.parent.GetChild(0).GetComponent<limitsManager>().isPlayerInsideRomm())
+        if(emptyEnemies && cleanRef + respawnTime < Time.realtimeSinceStartup && !transform.parent.GetChild(0).GetComponent<limitsManager>().isPlayerInsideRoom())
         {
             emptyEnemies = false;
 
