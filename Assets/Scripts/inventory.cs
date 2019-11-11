@@ -36,7 +36,10 @@ public class inventory : MonoBehaviour
         if (collision.gameObject.tag == "Enemy" && invulnerabilityFramesRef + invulnerabilityFrames < Time.frameCount)
         {
             invulnerabilityFramesRef = Time.frameCount;
-            pInv.lifes -= 20;
+            if(collision.transform.GetChild(0).name == "Alien_LOD")
+                pInv.lifes -= 20;
+            else if (collision.transform.GetChild(0).name == "Mamalien_LOD")
+                pInv.lifes -= 40;            
         }
     }
 }

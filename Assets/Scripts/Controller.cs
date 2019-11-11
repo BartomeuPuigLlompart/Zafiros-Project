@@ -129,7 +129,8 @@ public class Controller : MonoBehaviour
         mousePos = transform.GetChild(1).transform.position;
 
         Quaternion lastRotation = transform.rotation, nextRotation = transform.rotation;
-        if (!Input.GetKey(KeyCode.Space)){
+        if (!Input.GetKey(KeyCode.Space))
+        {
             transform.LookAt(new Vector3(mousePos.x, transform.position.y, mousePos.z));
             nextRotation = transform.rotation;
             transform.GetChild(1).GetComponent<MeshRenderer>().enabled = true;
@@ -138,6 +139,9 @@ public class Controller : MonoBehaviour
 
         transform.rotation = lastRotation;
         transform.rotation = Quaternion.Slerp(lastRotation, nextRotation, smoothRotation * Time.deltaTime);
+
+        rb.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
+        rb.constraints = RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezePositionY;
     }
 
     void checkShootMode()
