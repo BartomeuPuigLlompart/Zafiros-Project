@@ -39,7 +39,8 @@ public class inventory : MonoBehaviour
             if(collision.transform.GetChild(0).name == "Alien_LOD")
                 pInv.lifes -= 20;
             else if (collision.transform.GetChild(0).name == "Mamalien_LOD")
-                pInv.lifes -= 40;            
+                pInv.lifes -= 40;
+            else pInv.lifes -= 10;
         }
     }
 }
