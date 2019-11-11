@@ -129,7 +129,8 @@ public class Controller : MonoBehaviour
         mousePos = transform.GetChild(1).transform.position;
 
         Quaternion lastRotation = transform.rotation, nextRotation = transform.rotation;
-        if (!Input.GetKey(KeyCode.Space)){
+        if (!Input.GetKey(KeyCode.Space))
+        {
             transform.LookAt(new Vector3(mousePos.x, transform.position.y, mousePos.z));
             nextRotation = transform.rotation;
             transform.GetChild(1).GetComponent<MeshRenderer>().enabled = true;
@@ -138,6 +139,9 @@ public class Controller : MonoBehaviour
 
         transform.rotation = lastRotation;
         transform.rotation = Quaternion.Slerp(lastRotation, nextRotation, smoothRotation * Time.deltaTime);
+
+        rb.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
+        rb.constraints = RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezePositionY;
     }
 
     void checkShootMode()
@@ -170,7 +174,8 @@ public class Controller : MonoBehaviour
     {
         if (!overheated && Input.GetAxis("Fire") > 0 && overheat < overheatLimit)
         {
-            if (shootFrames == 0 || shootFrames == 30)
+            shootFrames++;
+            if (shootFrames == 60 || shootFrames == 30)
             {
                 GameObject shot = Instantiate(transform.GetChild(0).GetChild(0).GetChild(1).gameObject as GameObject);
                 shot.transform.position = transform.GetChild(0).GetChild(0).GetChild(1).transform.position;
@@ -199,10 +204,9 @@ public class Controller : MonoBehaviour
                 shot.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
                 shot.GetComponent<Rigidbody>().AddForce(shot.transform.forward * 1000.0f);
                 shot.AddComponent<shot>();
-            }
-            shootFrames++;
+            }           
             overheat += 2;
-            if (shootFrames == 60) shootFrames = 0;
+            if (shootFrames >= 60) shootFrames = 0;
         }
 
         else
@@ -223,6 +227,8 @@ public class Controller : MonoBehaviour
 
     void updateUI()
     {
+        //Overheat
+
         float range = (float)overheat / (float)overheatLimit;
         canvas.transform.GetChild(0).GetComponent<Slider>().value = range;
 
@@ -254,5 +260,9 @@ public class Controller : MonoBehaviour
             canvas.transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Image>().color = backgroundColor;
 
         }
+
+        //Lifes
+
+        canvas.transform.GetChild(1).GetComponent<Slider>().value = inventory.pInv.lifes;
     }
 }

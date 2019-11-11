@@ -70,7 +70,7 @@ public class limitsManager : MonoBehaviour
         if (other.gameObject.name.Substring(0, 4) == "ammo" && other.gameObject.transform.parent == null) Destroy(other.gameObject);
     }
 
-    public bool isPlayerInsideRomm()
+    public bool isPlayerInsideRoom()
     {
         return playerInside;
     }
