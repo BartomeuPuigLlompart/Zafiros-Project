@@ -8,8 +8,7 @@ public class inventory : MonoBehaviour
     public struct playerInventory
     {
         public int lifes;
-        public int armourPieces;
-        public int weaponPieces;
+        public int scrap;
         public bool weaponBlueprint;
     }
 
@@ -23,8 +22,7 @@ public class inventory : MonoBehaviour
     {
         pInv = new playerInventory();
         pInv.lifes = 100;
-        pInv.armourPieces = 0;
-        pInv.weaponPieces = 0;
+        pInv.scrap = 0;
         pInv.weaponBlueprint = false;
 
         invulnerabilityFrames = 30;

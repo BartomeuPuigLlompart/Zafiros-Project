@@ -51,6 +51,14 @@ public class Controller : MonoBehaviour
 
     Vector3 startPos;
 
+    public static GameObject room;
+
+    bool grounded;
+
+    const float height = 0.982f;
+
+    public static Vector3 roomLastPos;
+
     static public bool freeze;
 
     // Start is called before the first frame update
@@ -62,6 +70,9 @@ public class Controller : MonoBehaviour
         overheated = false;
         freeze = false;
         startPos = transform.position;
+        roomLastPos = Vector3.zero;
+        room = GameObject.Find("Base 1");
+        grounded = false;
 
         startLeftHandPos = leftArm.transform.localPosition;
         startLeftHandRot = leftArm.transform.localEulerAngles;
@@ -91,6 +102,11 @@ public class Controller : MonoBehaviour
         Cursor.visible = false;
     }
 
+    private void FixedUpdate()
+    {
+        grounded = false;   
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -100,9 +116,10 @@ public class Controller : MonoBehaviour
             updateOrientation();
             checkShootMode();
             checkShoot();
+            checkOutLimits();
         }
         else rb.constraints = RigidbodyConstraints.FreezeAll;
-        updateUI();
+        updateUI();        
     }
 
     void updateSpeed()
@@ -110,6 +127,8 @@ public class Controller : MonoBehaviour
         rb.velocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
         rb.velocity = rb.velocity.normalized * speed;
+
+        transform.position = new Vector3(transform.position.x, height, transform.position.z);
     }
 
     void updateOrientation()
@@ -225,6 +244,12 @@ public class Controller : MonoBehaviour
         }
     }
 
+    void checkOutLimits()
+    {
+        if (!grounded) transform.position += Vector3.Normalize(room.transform.position - roomLastPos);
+    }
+
+
     void updateUI()
     {
         //Overheat
@@ -264,5 +289,23 @@ public class Controller : MonoBehaviour
         //Lifes
 
         canvas.transform.GetChild(1).GetComponent<Slider>().value = inventory.pInv.lifes;
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.gameObject.layer == 9 && collision.gameObject == room.transform.GetChild(2).gameObject)
+        {
+            grounded = true;
+            roomLastPos = transform.position;
+        }        
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.layer == 9 && !freeze && Camera.main.transform.position == room.transform.position + limitsManager.cameraPosRef)
+        {
+            grounded = true;
+            transform.position = roomLastPos;
+        }
     }
 }

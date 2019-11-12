@@ -50,6 +50,8 @@ public class limitsManager : MonoBehaviour
                 Vector3 impulse = Camera.main.transform.position - GameObject.Find("Player").transform.position;
                 impulse = new Vector3(impulse.x, 0, impulse.z);
                 GameObject.Find("Player").transform.position += impulse.normalized * 3;
+                Controller.roomLastPos = GameObject.Find("Player").transform.position;
+                Controller.room = transform.parent.gameObject;
             }
             lerpFrames = 0;
             lerping = false;
@@ -66,7 +68,10 @@ public class limitsManager : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.tag == "Player") playerInside = false;
+        if (other.gameObject.tag == "Player")
+        {
+           playerInside = false;
+        }
         if (other.gameObject.name.Substring(0, 4) == "ammo" && other.gameObject.transform.parent == null) Destroy(other.gameObject);
     }
 
