@@ -39,6 +39,13 @@ public class inventory : MonoBehaviour
             else if (collision.transform.GetChild(0).name == "Mamalien_LOD")
                 pInv.lifes -= 40;
             else pInv.lifes -= 10;
+
+            if (pInv.lifes <= 0) pInv.lifes = 0;
+        }
+        else if(collision.gameObject.tag == "Scrap")
+        {
+            pInv.scrap += Random.Range(5, 30);
+            Destroy(collision.gameObject);
         }
     }
 }

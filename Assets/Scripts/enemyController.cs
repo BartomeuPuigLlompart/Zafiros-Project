@@ -75,8 +75,13 @@ public class enemyController : MonoBehaviour
     }
     void kill()
     {
+        if (shooter)
+        {
+            GameObject scrapDrop = Instantiate(GameObject.Find("Scrap") as GameObject);
+            scrapDrop.transform.position = new Vector3(transform.position.x + 3, -6.05f, transform.position.z + 3.75f);
+        }
         gameObject.SetActive(false);
-        transform.parent.GetComponent<enemiesManager>().checkEnemies();
+        transform.parent.GetComponent<enemiesManager>().checkEnemies();       
     }
 
     public void respawn()

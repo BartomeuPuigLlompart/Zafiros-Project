@@ -52,6 +52,7 @@ public class limitsManager : MonoBehaviour
                 GameObject.Find("Player").transform.position += impulse.normalized * 3;
                 Controller.roomLastPos = GameObject.Find("Player").transform.position;
                 Controller.room = transform.parent.gameObject;
+                if (Controller.room.name.Substring(0, 4) == "Base") inventory.pInv.lifes = 100;
             }
             lerpFrames = 0;
             lerping = false;
