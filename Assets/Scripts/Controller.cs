@@ -291,6 +291,11 @@ public class Controller : MonoBehaviour
         canvas.transform.GetChild(1).GetComponent<Slider>().value = inventory.pInv.lifes;
     }
 
+    void respawn()
+    {
+        ;
+    }
+
     private void OnCollisionStay(Collision collision)
     {
         if (collision.gameObject.layer == 9 && collision.gameObject == room.transform.GetChild(2).gameObject)

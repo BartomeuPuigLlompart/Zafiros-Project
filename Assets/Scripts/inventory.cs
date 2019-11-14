@@ -1,17 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Jobs;
+using System.ComponentModel;
 
 public class inventory : MonoBehaviour
 {
-
     public struct playerInventory
     {
         public int lifes;
         public int scrap;
         public bool weaponBlueprint;
     }
-
     public static playerInventory pInv;
 
     int invulnerabilityFrames;
@@ -27,6 +27,16 @@ public class inventory : MonoBehaviour
 
         invulnerabilityFrames = 30;
         invulnerabilityFramesRef = 0;
+    }
+
+    void saveInventory()
+    {
+        ;
+    }
+
+    void loadInventory()
+    {
+        ;
     }
 
     private void OnCollisionStay(Collision collision)
