@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Unity.Jobs;
 using System.ComponentModel;
 
@@ -21,22 +22,29 @@ public class inventory : MonoBehaviour
     void Start()
     {
         pInv = new playerInventory();
-        pInv.lifes = 100;
-        pInv.scrap = 0;
-        pInv.weaponBlueprint = false;
+        if (!PlayerPrefs.HasKey("Scrap"))
+        {
+            pInv.lifes = 100;
+            pInv.scrap = 0;
+            pInv.weaponBlueprint = false;
+        }
+        else loadInventory();
 
         invulnerabilityFrames = 30;
         invulnerabilityFramesRef = 0;
     }
 
-    void saveInventory()
+    public void saveInventory()
     {
-        ;
+        PlayerPrefs.SetInt("Scrap", pInv.scrap);
+        PlayerPrefs.SetInt("Blueprint", pInv.weaponBlueprint == true ? 1 : 0);
     }
 
-    void loadInventory()
+    public void loadInventory()
     {
-        ;
+        pInv.lifes = 100;
+        pInv.scrap = PlayerPrefs.GetInt("Scrap");
+        pInv.weaponBlueprint = PlayerPrefs.GetInt("Blueprint") == 1 ? true : false;
     }
 
     private void OnCollisionStay(Collision collision)
@@ -50,7 +58,7 @@ public class inventory : MonoBehaviour
                 pInv.lifes -= 40;
             else pInv.lifes -= 10;
 
-            if (pInv.lifes <= 0) pInv.lifes = 0;
+            if (pInv.lifes <= 0) SceneManager.LoadScene("Alien Ship");
         }
         else if(collision.gameObject.tag == "Scrap")
         {

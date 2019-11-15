@@ -100,6 +100,8 @@ public class Controller : MonoBehaviour
         }
 
         Cursor.visible = false;
+
+        if (PlayerPrefs.HasKey("LastBase")) respawn();
     }
 
     private void FixedUpdate()
@@ -289,11 +291,16 @@ public class Controller : MonoBehaviour
         //Lifes
 
         canvas.transform.GetChild(1).GetComponent<Slider>().value = inventory.pInv.lifes;
+
+        //Scrap
+
+        canvas.transform.GetChild(2).GetChild(0).GetComponent<Text>().text = inventory.pInv.scrap.ToString();
     }
 
     void respawn()
     {
-        ;
+        transform.position = GameObject.Find(PlayerPrefs.GetString("LastBase")).transform.position;
+        GetComponent<inventory>().loadInventory();
     }
 
     private void OnCollisionStay(Collision collision)
