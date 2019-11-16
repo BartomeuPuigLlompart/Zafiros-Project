@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class blueprintAnimator : MonoBehaviour
 {
-
+    private void Start()
+    {
+        if (PlayerPrefs.HasKey("Blueprint") && (PlayerPrefs.GetInt("Blueprint") == 1 ? true : false) == true) Destroy(gameObject);
+    }
     // Update is called once per frame
     void Update()
     {
