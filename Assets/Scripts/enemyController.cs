@@ -64,19 +64,24 @@ public class enemyController : MonoBehaviour
         transform.GetChild(0).transform.localPosition = initialModelLocalPos;
     }
 
-    public void hit()
+    public void hit(int damage)
     {
         if (invulnerabilityFramesRef + invulnerabilityFrames < Time.frameCount)
         {
             invulnerabilityFramesRef = Time.frameCount;
-            lifes--;
+            lifes -= damage;
         }
-        if (lifes == 0) kill();
+        if (lifes <= 0) kill();
     }
     void kill()
     {
+        if (shooter)
+        {
+            GameObject scrapDrop = Instantiate(GameObject.Find("Scrap") as GameObject);
+            scrapDrop.transform.position = new Vector3(transform.position.x + 3, -6.05f, transform.position.z + 3.75f);
+        }
         gameObject.SetActive(false);
-        transform.parent.GetComponent<enemiesManager>().checkEnemies();
+        transform.parent.GetComponent<enemiesManager>().checkEnemies();       
     }
 
     public void respawn()

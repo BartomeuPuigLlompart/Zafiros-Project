@@ -48,6 +48,8 @@ public class enemiesManager : MonoBehaviour
     {
         emptyEnemies = true;
         roomsManager.cleanRoom = true;
+        inventory.pInv.lifes += 20;
+        if (inventory.pInv.lifes > 100) inventory.pInv.lifes = 100;
         if(emptyEnemies && cleanRef + respawnTime < Time.realtimeSinceStartup) cleanRef = Time.realtimeSinceStartup;
     }
 

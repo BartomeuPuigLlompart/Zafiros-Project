@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class shot : MonoBehaviour
 {
+    int damage;
     private void Start()
     {
+        if (GameObject.Find("Player").transform.GetChild(0).GetChild(0).GetChild(0).GetChild(5).gameObject.activeSelf) damage = 2;
+        else damage = 1;
         Physics.IgnoreLayerCollision(11, 11, true);
     }
 
@@ -21,7 +24,7 @@ public class shot : MonoBehaviour
         {
             if (collision.gameObject.transform.parent.name == "Enemies")
             {
-                collision.gameObject.GetComponent<enemyController>().hit();
+                collision.gameObject.GetComponent<enemyController>().hit(damage);
                 Destroy(gameObject);
             }
             else if (collision.gameObject.transform.parent.name == "Obstacles") Destroy(gameObject);
@@ -30,6 +33,7 @@ public class shot : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        else if(collision.gameObject.name == "Scrap(Clone)") Destroy(gameObject);
     }
 
 }

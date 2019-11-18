@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class enemyProjectile : MonoBehaviour
 {
@@ -20,7 +21,8 @@ public class enemyProjectile : MonoBehaviour
         }
         else if (collision.gameObject.tag == "Player")
         {
-            inventory.pInv.lifes -= 30;
+            inventory.pInv.lifes -= 30 - 30 / inventory.pInv.armour;
+            if (inventory.pInv.lifes <= 0) SceneManager.LoadScene("Alien Ship");
             Destroy(gameObject);
         }
     }

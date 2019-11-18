@@ -100,6 +100,17 @@ public class Controller : MonoBehaviour
         }
 
         Cursor.visible = false;
+
+        if(PlayerPrefs.HasKey("Weapon Bought") && (PlayerPrefs.GetInt("Weapon Bought") == 1 ? true : false) == true)
+        {
+            showSecundary();
+        }
+        else
+        {
+            showPrimary();
+        }
+
+        if (PlayerPrefs.HasKey("LastBase")) respawn();
     }
 
     private void FixedUpdate()
@@ -110,16 +121,18 @@ public class Controller : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!freeze)
+        if (!freeze && canvas.transform.GetChild(0).gameObject.activeSelf)
         {
             updateSpeed();
             updateOrientation();
+            checkWeapon();
             checkShootMode();
             checkShoot();
             checkOutLimits();
         }
         else rb.constraints = RigidbodyConstraints.FreezeAll;
-        updateUI();        
+        checkUIMode();
+        updateUI();
     }
 
     void updateSpeed()
@@ -161,6 +174,52 @@ public class Controller : MonoBehaviour
 
         rb.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
         rb.constraints = RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezePositionY;
+    }
+
+    void checkWeapon()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1)) showPrimary();
+        else if (Input.GetKeyDown(KeyCode.Alpha2)) showSecundary();
+    }
+
+    void showPrimary()
+    {
+        transform.GetChild(0).GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(true);
+        transform.GetChild(0).GetChild(0).GetChild(0).GetChild(1).gameObject.SetActive(true);
+        transform.GetChild(0).GetChild(0).GetChild(0).GetChild(2).gameObject.SetActive(true);
+        transform.GetChild(0).GetChild(0).GetChild(0).GetChild(3).gameObject.SetActive(true);
+        transform.GetChild(0).GetChild(0).GetChild(0).GetChild(4).gameObject.SetActive(true);
+        transform.GetChild(0).GetChild(0).GetChild(0).GetChild(5).gameObject.SetActive(false);
+
+        transform.GetChild(0).GetChild(1).GetChild(0).GetChild(0).gameObject.SetActive(true);
+        transform.GetChild(0).GetChild(1).GetChild(0).GetChild(1).gameObject.SetActive(true);
+        transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).gameObject.SetActive(true);
+        transform.GetChild(0).GetChild(1).GetChild(0).GetChild(3).gameObject.SetActive(true);
+        transform.GetChild(0).GetChild(1).GetChild(0).GetChild(4).gameObject.SetActive(true);
+        transform.GetChild(0).GetChild(1).GetChild(0).GetChild(5).gameObject.SetActive(false);
+
+        canvas.transform.GetChild(3).GetChild(0).gameObject.SetActive(true);
+        canvas.transform.GetChild(3).GetChild(1).gameObject.SetActive(false);
+    }
+
+    void showSecundary()
+    {
+        transform.GetChild(0).GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(false);
+        transform.GetChild(0).GetChild(0).GetChild(0).GetChild(1).gameObject.SetActive(false);
+        transform.GetChild(0).GetChild(0).GetChild(0).GetChild(2).gameObject.SetActive(false);
+        transform.GetChild(0).GetChild(0).GetChild(0).GetChild(3).gameObject.SetActive(false);
+        transform.GetChild(0).GetChild(0).GetChild(0).GetChild(4).gameObject.SetActive(false);
+        transform.GetChild(0).GetChild(0).GetChild(0).GetChild(5).gameObject.SetActive(true);
+
+        transform.GetChild(0).GetChild(1).GetChild(0).GetChild(0).gameObject.SetActive(false);
+        transform.GetChild(0).GetChild(1).GetChild(0).GetChild(1).gameObject.SetActive(false);
+        transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).gameObject.SetActive(false);
+        transform.GetChild(0).GetChild(1).GetChild(0).GetChild(3).gameObject.SetActive(false);
+        transform.GetChild(0).GetChild(1).GetChild(0).GetChild(4).gameObject.SetActive(false);
+        transform.GetChild(0).GetChild(1).GetChild(0).GetChild(5).gameObject.SetActive(true);
+
+        canvas.transform.GetChild(3).GetChild(0).gameObject.SetActive(false);
+        canvas.transform.GetChild(3).GetChild(1).gameObject.SetActive(true);
     }
 
     void checkShootMode()
@@ -249,46 +308,95 @@ public class Controller : MonoBehaviour
         if (!grounded) transform.position += Vector3.Normalize(room.transform.position - roomLastPos);
     }
 
+    void checkUIMode()
+    {
+        if (room.name.Substring(0, 4) == "Base" && !freeze)
+        {
+            if (canvas.transform.GetChild(0).gameObject.activeSelf && Input.GetKeyDown(KeyCode.Tab)) showShopUI();
+            else if (Input.GetKeyDown(KeyCode.Tab)) hideShopUI();
+        }
+        else if (!canvas.transform.GetChild(0).gameObject.activeSelf) hideShopUI();
+    }
+
+    void showShopUI()
+    {
+        canvas.transform.GetChild(0).gameObject.SetActive(false);
+        canvas.transform.GetChild(1).gameObject.SetActive(false);
+        canvas.transform.GetChild(2).gameObject.SetActive(false);
+        canvas.transform.GetChild(3).gameObject.SetActive(false);
+        canvas.transform.GetChild(4).gameObject.SetActive(true);
+
+        Cursor.visible = true;
+    }
+
+    void hideShopUI()
+    {
+        canvas.transform.GetChild(0).gameObject.SetActive(true);
+        canvas.transform.GetChild(1).gameObject.SetActive(true);
+        canvas.transform.GetChild(2).gameObject.SetActive(true);
+        canvas.transform.GetChild(3).gameObject.SetActive(true);
+        canvas.transform.GetChild(4).gameObject.SetActive(false);
+
+        Cursor.visible = false;
+
+        GetComponent<inventory>().saveInventory();
+    }
 
     void updateUI()
     {
         //Overheat
+        if (canvas.transform.GetChild(0).gameObject.activeSelf)
+        {
+            float range = (float)overheat / (float)overheatLimit;
+            canvas.transform.GetChild(0).GetComponent<Slider>().value = range;
 
-        float range = (float)overheat / (float)overheatLimit;
-        canvas.transform.GetChild(0).GetComponent<Slider>().value = range;
+            Color sliderColor, backgroundColor;
+            ColorBlock colorBlockSlider = canvas.transform.GetChild(0).GetComponent<Slider>().colors;
+            sliderColor = colorBlockSlider.disabledColor;
 
-        Color sliderColor, backgroundColor;
-        ColorBlock colorBlockSlider = canvas.transform.GetChild(0).GetComponent<Slider>().colors;
-        sliderColor = colorBlockSlider.disabledColor;
+            backgroundColor = canvas.transform.GetChild(0).GetChild(0).GetComponent<Image>().color;
 
-        backgroundColor = canvas.transform.GetChild(0).GetChild(0).GetComponent<Image>().color;
+            if (!overheated)
+            {
+                sliderColor.r = 1;
+                sliderColor.g = 194.0f / 255.0f;
+                sliderColor.b = 0;
+                colorBlockSlider.disabledColor = sliderColor;
+                canvas.transform.GetChild(0).GetComponent<Slider>().colors = colorBlockSlider;
 
-        if (!overheated)
-        {            
-            sliderColor.r = 1;
-            sliderColor.g = 194.0f / 255.0f;
-            sliderColor.b = 0;
-            colorBlockSlider.disabledColor = sliderColor;
-            canvas.transform.GetChild(0).GetComponent<Slider>().colors = colorBlockSlider;
+                backgroundColor.g = 155.0f / 255.0f - (range * 155) / 255.0f;
+                canvas.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = backgroundColor;
+                canvas.transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Image>().color = backgroundColor;
+            }
+            else
+            {
+                backgroundColor.r = sliderColor.r = 1;
+                backgroundColor.g = backgroundColor.b = sliderColor.g = sliderColor.b = 0;
+                colorBlockSlider.disabledColor = sliderColor;
+                canvas.transform.GetChild(0).GetComponent<Slider>().colors = colorBlockSlider;
+                canvas.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = backgroundColor;
+                canvas.transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Image>().color = backgroundColor;
 
-            backgroundColor.g = 155.0f / 255.0f - (range * 155) / 255.0f;
-            canvas.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = backgroundColor;
-            canvas.transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Image>().color = backgroundColor;
+            }
+
+            //Lifes
+
+            canvas.transform.GetChild(1).GetComponent<Slider>().value = inventory.pInv.lifes;
+
+            //Scrap
+
+            canvas.transform.GetChild(2).GetChild(0).GetComponent<Text>().text = inventory.pInv.scrap.ToString();
         }
         else
         {
-            backgroundColor.r = sliderColor.r = 1;
-            backgroundColor.g = backgroundColor.b = sliderColor.g = sliderColor.b = 0;
-            colorBlockSlider.disabledColor = sliderColor;
-            canvas.transform.GetChild(0).GetComponent<Slider>().colors = colorBlockSlider;
-            canvas.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = backgroundColor;
-            canvas.transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Image>().color = backgroundColor;
-
+            canvas.transform.GetChild(4).GetChild(3).GetChild(0).GetComponent<Text>().text = inventory.pInv.scrap.ToString();
         }
+    }
 
-        //Lifes
-
-        canvas.transform.GetChild(1).GetComponent<Slider>().value = inventory.pInv.lifes;
+    void respawn()
+    {
+        transform.position = GameObject.Find(PlayerPrefs.GetString("LastBase")).transform.position;
+        GetComponent<inventory>().loadInventory();
     }
 
     private void OnCollisionStay(Collision collision)
