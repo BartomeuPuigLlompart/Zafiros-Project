@@ -6,7 +6,19 @@ public class blueprintAnimator : MonoBehaviour
 {
     private void Start()
     {
-        if (PlayerPrefs.HasKey("Blueprint") && (PlayerPrefs.GetInt("Blueprint") == 1 ? true : false) == true) Destroy(gameObject);
+        if (PlayerPrefs.HasKey("Blueprint") && (PlayerPrefs.GetInt("Blueprint") == 1 ? true : false) == true)
+        {
+            Color c = transform.GetChild(0).GetComponent<Renderer>().material.color;
+            c.a = 1.0f;
+            transform.GetChild(0).GetComponent<Renderer>().material.color = c;
+            Destroy(gameObject);
+        }
+        else
+        {
+            Color c = transform.GetChild(0).GetComponent<Renderer>().material.color;
+            c.a = 0.45f;
+            transform.GetChild(0).GetComponent<Renderer>().material.color = c;
+        }
     }
     // Update is called once per frame
     void Update()

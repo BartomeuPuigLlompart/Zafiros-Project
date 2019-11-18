@@ -10,8 +10,10 @@ public class inventory : MonoBehaviour
     public struct playerInventory
     {
         public int lifes;
+        public int armour;
         public int scrap;
         public bool weaponBlueprint;
+        public bool weaponBought;
     }
     public static playerInventory pInv;
 
@@ -22,11 +24,13 @@ public class inventory : MonoBehaviour
     void Start()
     {
         pInv = new playerInventory();
-        if (!PlayerPrefs.HasKey("Scrap"))
+        if (!PlayerPrefs.HasKey("Armour"))
         {
             pInv.lifes = 100;
+            pInv.armour = 10;
             pInv.scrap = 0;
             pInv.weaponBlueprint = false;
+            pInv.weaponBought = false;
         }
         else loadInventory();
 
@@ -36,15 +40,19 @@ public class inventory : MonoBehaviour
 
     public void saveInventory()
     {
+        PlayerPrefs.SetInt("Armour", pInv.armour);
         PlayerPrefs.SetInt("Scrap", pInv.scrap);
         PlayerPrefs.SetInt("Blueprint", pInv.weaponBlueprint == true ? 1 : 0);
+        PlayerPrefs.SetInt("Weapon Bought", pInv.weaponBought == true ? 1 : 0);
     }
 
     public void loadInventory()
     {
         pInv.lifes = 100;
+        pInv.armour = PlayerPrefs.GetInt("Armour");
         pInv.scrap = PlayerPrefs.GetInt("Scrap");
         pInv.weaponBlueprint = PlayerPrefs.GetInt("Blueprint") == 1 ? true : false;
+        pInv.weaponBought = PlayerPrefs.GetInt("Weapon Bought") == 1 ? true : false;
     }
 
     private void OnCollisionStay(Collision collision)
@@ -53,10 +61,10 @@ public class inventory : MonoBehaviour
         {
             invulnerabilityFramesRef = Time.frameCount;
             if(collision.transform.GetChild(0).name == "Alien_LOD")
-                pInv.lifes -= 20;
+                pInv.lifes -= 20 - 20 / pInv.armour;
             else if (collision.transform.GetChild(0).name == "Mamalien_LOD")
-                pInv.lifes -= 40;
-            else pInv.lifes -= 10;
+                pInv.lifes -= 40 - 40 / pInv.armour;
+            else pInv.lifes -= 10 - 10 / pInv.armour;
 
             if (pInv.lifes <= 0) SceneManager.LoadScene("Alien Ship");
         }

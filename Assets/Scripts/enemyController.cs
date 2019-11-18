@@ -64,14 +64,14 @@ public class enemyController : MonoBehaviour
         transform.GetChild(0).transform.localPosition = initialModelLocalPos;
     }
 
-    public void hit()
+    public void hit(int damage)
     {
         if (invulnerabilityFramesRef + invulnerabilityFrames < Time.frameCount)
         {
             invulnerabilityFramesRef = Time.frameCount;
-            lifes--;
+            lifes -= damage;
         }
-        if (lifes == 0) kill();
+        if (lifes <= 0) kill();
     }
     void kill()
     {
